@@ -30,10 +30,20 @@ window.SidebarManager = {
   
       console.log('[Sidebar] Sidebar element found');
   
+      // Ensure header and main are available
+      if (!this.headerEl || !this.mainEl) {
+        console.warn('[Sidebar] Header or main not found, retrying...');
+        setTimeout(() => this.init(), 100);
+        return;
+      }
+  
       // Load collapsed state from localStorage
       const savedState = localStorage.getItem('sidebar-collapsed');
       if (savedState === 'true') {
-        this.collapse();
+        // Use setTimeout to ensure DOM is ready
+        setTimeout(() => {
+          this.collapse();
+        }, 50);
       }
   
       // Bind toggle button di sidebar
@@ -156,28 +166,25 @@ window.SidebarManager = {
       
       this.isCollapsed = true;
   
-      // Sidebar: w-64 -> w-20
-      this.sidebar.classList.remove('w-64');
-      this.sidebar.classList.add('w-20', 'collapsed');
+      // Sidebar: add collapsed class (CSS handles width)
+      this.sidebar.classList.add('collapsed');
   
-      // Hide texts
+      // Hide texts (CSS handles this, but we keep for compatibility)
       this.sidebar.querySelectorAll('.sidebar-title, .sidebar-subtitle, .sidebar-nav-text').forEach(el => {
         el.classList.add('hidden');
       });
       
-      // Center nav items
+      // Center nav items (CSS handles this, but we keep for compatibility)
       this.sidebar.querySelectorAll('a.nav-item').forEach(el => {
         el.classList.add('justify-center');
       });
   
-      // Header/Main: md:ml-64 -> md:ml-20
+      // Header/Main: add collapsed class (CSS handles margin)
       if (this.headerEl) {
-        this.headerEl.classList.remove('md:ml-64');
-        this.headerEl.classList.add('md:ml-20');
+        this.headerEl.classList.add('sidebar-collapsed');
       }
       if (this.mainEl) {
-        this.mainEl.classList.remove('md:ml-64');
-        this.mainEl.classList.add('md:ml-20');
+        this.mainEl.classList.add('sidebar-collapsed');
       }
   
       // Update icon
@@ -195,28 +202,25 @@ window.SidebarManager = {
       
       this.isCollapsed = false;
   
-      // Sidebar: w-20 -> w-64
-      this.sidebar.classList.remove('w-20', 'collapsed');
-      this.sidebar.classList.add('w-64');
+      // Sidebar: remove collapsed class (CSS handles width)
+      this.sidebar.classList.remove('collapsed');
   
-      // Show texts
+      // Show texts (CSS handles this, but we keep for compatibility)
       this.sidebar.querySelectorAll('.sidebar-title, .sidebar-subtitle, .sidebar-nav-text').forEach(el => {
         el.classList.remove('hidden');
       });
       
-      // Reset nav items
+      // Reset nav items (CSS handles this, but we keep for compatibility)
       this.sidebar.querySelectorAll('a.nav-item').forEach(el => {
         el.classList.remove('justify-center');
       });
   
-      // Header/Main: md:ml-20 -> md:ml-64
+      // Header/Main: remove collapsed class (CSS handles margin)
       if (this.headerEl) {
-        this.headerEl.classList.remove('md:ml-20');
-        this.headerEl.classList.add('md:ml-64');
+        this.headerEl.classList.remove('sidebar-collapsed');
       }
       if (this.mainEl) {
-        this.mainEl.classList.remove('md:ml-20');
-        this.mainEl.classList.add('md:ml-64');
+        this.mainEl.classList.remove('sidebar-collapsed');
       }
   
       // Update icon

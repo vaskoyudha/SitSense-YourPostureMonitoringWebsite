@@ -149,6 +149,53 @@ body::before {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Sidebar Collapsed State */
+#sidebar.collapsed {
+  width: 80px !important;
+}
+
+#sidebar.collapsed .sidebar-title,
+#sidebar.collapsed .sidebar-subtitle,
+#sidebar.collapsed .sidebar-nav-text {
+  display: none !important;
+}
+
+#sidebar.collapsed .nav-item {
+  justify-content: center !important;
+}
+
+#sidebar.collapsed .sidebar-brand {
+  justify-content: center !important;
+}
+
+/* Header and Main margin adjustment for collapsed sidebar */
+@media (min-width: 768px) {
+  /* Desktop: sidebar always visible, adjust margins */
+  /* Default state: sidebar expanded (256px = w-64) */
+  header:not(.sidebar-collapsed),
+  main:not(.sidebar-collapsed) {
+    margin-left: 256px;
+  }
+  
+  /* Collapsed state: sidebar collapsed (80px = w-20) */
+  header.sidebar-collapsed,
+  main.sidebar-collapsed {
+    margin-left: 80px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Mobile: sidebar overlay behavior, no margin needed */
+  #sidebar {
+    width: 256px !important;
+  }
+  
+  header,
+  main {
+    margin-left: 0 !important;
+  }
+}
+
 /* Hero Section */
 .hero-section {
   min-height: 300px;
