@@ -150,8 +150,27 @@ body::before {
 }
 
 /* Sidebar Collapsed State */
+#sidebar {
+  transition: width 0.3s ease-in-out, margin 0.3s ease-in-out !important;
+}
+
 #sidebar.collapsed {
   width: 80px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* Smooth transitions for header and main when sidebar toggles */
+header, main {
+  transition: margin-left 0.3s ease-in-out !important;
+}
+
+/* Prevent transitions during initial load to avoid flash */
+#sidebar.sidebar-initializing,
+#sidebar.sidebar-initializing *,
+header.sidebar-collapsed.sidebar-initializing,
+main.sidebar-collapsed.sidebar-initializing {
+  transition: none !important;
 }
 
 #sidebar.collapsed .sidebar-title,
@@ -162,10 +181,69 @@ body::before {
 
 #sidebar.collapsed .nav-item {
   justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  gap: 0 !important;
 }
 
 #sidebar.collapsed .sidebar-brand {
   justify-content: center !important;
+  gap: 0 !important;
+}
+
+/* Prevent horizontal scroll in collapsed sidebar */
+#sidebar.collapsed > div {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 80px !important;
+}
+
+#sidebar.collapsed nav,
+#sidebar.collapsed > div > div:first-child,
+#sidebar.collapsed > div > div:last-child {
+  overflow-x: hidden !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+  box-sizing: border-box !important;
+}
+
+#sidebar.collapsed > div > div:first-child {
+  padding: 1rem 0.5rem !important;
+}
+
+#sidebar.collapsed .nav-item,
+#sidebar.collapsed button {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+#sidebar.collapsed .sidebar-logo {
+  margin: 0 auto !important;
+}
+
+/* Additional overflow prevention */
+#sidebar.collapsed * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#sidebar.collapsed i[data-lucide] {
+  margin: 0 auto !important;
+  flex-shrink: 0 !important;
+}
+
+/* Ensure no text wrapping issues */
+#sidebar.collapsed .nav-item span,
+#sidebar.collapsed button span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  max-width: 0 !important;
+  width: 0 !important;
+  display: none !important;
 }
 
 /* Header and Main margin adjustment for collapsed sidebar */
@@ -215,9 +293,8 @@ body::before {
 /* Heatmap canvas treatment */
 #heatmapCanvas { image-rendering: optimizeQuality; filter: contrast(115%) saturate(118%); }
 /* Optional mask if you want to clip the heatmap to a shape */
+/* Mask image akan di-set via JavaScript dengan fallback ke berbagai format */
 .heatmap--masked { 
-  -webkit-mask-image: url('/assets/img/heatmap-mask.svg');
-  mask-image: url('/assets/img/heatmap-mask.svg');
   -webkit-mask-size: contain; mask-size: contain;
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
   -webkit-mask-position: center; mask-position: center;

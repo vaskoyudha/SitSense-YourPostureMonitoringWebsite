@@ -37,13 +37,43 @@ window.SidebarManager = {
         return;
       }
   
-      // Load collapsed state from localStorage
+      // Load collapsed state from localStorage IMMEDIATELY (before any transitions)
+      // This prevents the "flash" of expanded sidebar before collapsing
       const savedState = localStorage.getItem('sidebar-collapsed');
       if (savedState === 'true') {
-        // Use setTimeout to ensure DOM is ready
+        // Apply collapsed state immediately without animation
+        this.sidebar.classList.add('collapsed', 'sidebar-initializing');
+        this.isCollapsed = true;
+        
+        // Apply to header/main immediately
+        if (this.headerEl) {
+          this.headerEl.classList.add('sidebar-collapsed');
+        }
+        if (this.mainEl) {
+          this.mainEl.classList.add('sidebar-collapsed');
+        }
+        
+        // Hide texts immediately
+        this.sidebar.querySelectorAll('.sidebar-title, .sidebar-subtitle, .sidebar-nav-text').forEach(el => {
+          el.classList.add('hidden');
+        });
+        
+        // Center nav items immediately
+        this.sidebar.querySelectorAll('a.nav-item').forEach(el => {
+          el.classList.add('justify-center');
+        });
+        
+        // Update icon immediately
+        this.updateToggleIcon();
+        
+        // Remove initializing class after a short delay to allow smooth transitions for future changes
         setTimeout(() => {
-          this.collapse();
-        }, 50);
+          this.sidebar.classList.remove('sidebar-initializing');
+        }, 100);
+      } else {
+        // Ensure expanded state is set
+        this.isCollapsed = false;
+        this.sidebar.classList.remove('collapsed', 'sidebar-initializing');
       }
   
       // Bind toggle button di sidebar
@@ -79,8 +109,15 @@ window.SidebarManager = {
         });
       });
       
-      // Mark active nav item
-      this.markActiveNav();
+      // Mark active nav item (with delay to ensure DOM is ready)
+      setTimeout(() => {
+        this.markActiveNav();
+      }, 100);
+      
+      // Also mark active nav after a longer delay to catch async loaded content
+      setTimeout(() => {
+        this.markActiveNav();
+      }, 500);
       
       // Handle window resize
       this.handleResize();
@@ -166,6 +203,9 @@ window.SidebarManager = {
       
       this.isCollapsed = true;
   
+      // Remove initializing class if present (to allow smooth transition)
+      this.sidebar.classList.remove('sidebar-initializing');
+  
       // Sidebar: add collapsed class (CSS handles width)
       this.sidebar.classList.add('collapsed');
   
@@ -201,6 +241,9 @@ window.SidebarManager = {
       console.log('[Sidebar] Expanding...');
       
       this.isCollapsed = false;
+  
+      // Remove initializing class if present (to allow smooth transition)
+      this.sidebar.classList.remove('sidebar-initializing');
   
       // Sidebar: remove collapsed class (CSS handles width)
       this.sidebar.classList.remove('collapsed');
@@ -311,24 +354,100 @@ window.SidebarManager = {
     },
     
     markActiveNav: function() {
-      const path = location.pathname.toLowerCase();
+      // Get current path and filename
+      const path = window.location.pathname.toLowerCase();
       const file = path.split('/').pop() || 'index.html';
+      const href = window.location.href.toLowerCase();
       
-      document.querySelectorAll('a[data-nav]').forEach(a => {
+      console.log('[Sidebar] Marking active nav - path:', path, 'file:', file, 'href:', href);
+      
+      // Find all nav items
+      const navItems = document.querySelectorAll('a[data-nav]');
+      
+      if (navItems.length === 0) {
+        console.warn('[Sidebar] No nav items found, retrying...');
+        setTimeout(() => this.markActiveNav(), 100);
+        return;
+      }
+      
+      navItems.forEach(a => {
+        // Remove all active classes
         a.classList.remove('bg-cyan-500/10', 'text-cyan-300', 'border-l-2', 'border-cyan-400', 'active');
         
-        const k = a.getAttribute('data-nav');
-        const isActive = 
-          (k === 'home' && (file === 'home.html' || path.includes('home'))) ||
-          (k === 'dashboard' && (file === 'index.html' || file === '' || path.endsWith('/'))) ||
-          (k === 'history' && (file === 'history.html' || path.includes('history'))) ||
-          (k === 'reports' && (file === 'reports.html' || path.includes('reports'))) ||
-          (k === 'settings' && (file === 'settings.html' || path.includes('settings'))) ||
-          (k === 'about' && (file === 'about.html' || path.includes('about'))) ||
-          (k === 'help' && (file === 'help.html' || path.includes('help')));
+        const navKey = a.getAttribute('data-nav');
+        if (!navKey) return;
+        
+        // Get the href from the nav item to compare
+        const navHref = a.getAttribute('href') || '';
+        const navFile = navHref.split('/').pop() || '';
+        
+        // Check if this nav item is active
+        let isActive = false;
+        
+        // Simple method: Check by filename match
+        if (navFile && file) {
+          // Direct filename match
+          if (navFile === file) {
+            isActive = true;
+          }
+          // Also check if current file matches the nav key's expected file
+          else {
+            switch(navKey) {
+              case 'home':
+                isActive = file === 'home.html';
+                break;
+              case 'dashboard':
+                isActive = file === 'index.html' || file === '' || path.endsWith('/');
+                break;
+              case 'history':
+                isActive = file === 'history.html';
+                break;
+              case 'reports':
+                isActive = file === 'reports.html';
+                break;
+              case 'settings':
+                isActive = file === 'settings.html';
+                break;
+              case 'about':
+                isActive = file === 'about.html';
+                break;
+              case 'help':
+                isActive = file === 'help.html';
+                break;
+            }
+          }
+        } else {
+          // Fallback: check by nav key
+          switch(navKey) {
+            case 'home':
+              isActive = file === 'home.html' || href.includes('home.html');
+              break;
+            case 'dashboard':
+              isActive = (file === 'index.html' || file === '' || path.endsWith('/')) && 
+                        !href.includes('home.html') && !href.includes('history.html') && 
+                        !href.includes('settings.html') && !href.includes('reports.html');
+              break;
+            case 'history':
+              isActive = file === 'history.html' || href.includes('history.html');
+              break;
+            case 'reports':
+              isActive = file === 'reports.html' || href.includes('reports.html');
+              break;
+            case 'settings':
+              isActive = file === 'settings.html' || href.includes('settings.html');
+              break;
+            case 'about':
+              isActive = file === 'about.html' || href.includes('about.html');
+              break;
+            case 'help':
+              isActive = file === 'help.html' || href.includes('help.html');
+              break;
+          }
+        }
         
         if (isActive) {
           a.classList.add('bg-cyan-500/10', 'text-cyan-300', 'border-l-2', 'border-cyan-400', 'active');
+          console.log('[Sidebar] Active nav item:', navKey, 'file:', file);
         }
       });
     }
@@ -361,5 +480,31 @@ window.SidebarManager = {
       window.lucide.createIcons();
     }
   }, 200);
+  
+  // Mark active nav when page loads (fallback)
+  if (document.readyState === 'complete') {
+    setTimeout(() => {
+      if (window.SidebarManager && window.SidebarManager.markActiveNav) {
+        window.SidebarManager.markActiveNav();
+      }
+    }, 500);
+  } else {
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (window.SidebarManager && window.SidebarManager.markActiveNav) {
+          window.SidebarManager.markActiveNav();
+        }
+      }, 500);
+    });
+  }
+  
+  // Mark active nav when navigation occurs (for SPA-like behavior)
+  window.addEventListener('popstate', () => {
+    setTimeout(() => {
+      if (window.SidebarManager && window.SidebarManager.markActiveNav) {
+        window.SidebarManager.markActiveNav();
+      }
+    }, 100);
+  });
   
   console.log('[Sidebar] sidebar.js loaded');

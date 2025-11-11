@@ -151,7 +151,10 @@
 
   <body class="min-h-screen text-slate-100">
     <!-- ================= SIDEBAR ================= -->
+    <!-- Sidebar Manager harus dimuat SEBELUM sidebar HTML -->
+    <script src="./assets/js/sidebar.js"></script>
     <div id="sidebar-slot"></div>
+    <script src="./assets/js/image-loader.js"></script>
     <script>
       (async () => {
         const slot = document.getElementById('sidebar-slot');
@@ -159,6 +162,16 @@
         // Render icons setelah sidebar dimuat
         if (window.lucide) {
           window.lucide.createIcons();
+        }
+        // Initialize images setelah komponen dimuat
+        if (window.ImageLoader && window.ImageLoader.initializeImages) {
+          setTimeout(() => window.ImageLoader.initializeImages(), 100);
+        }
+        // Mark active nav item setelah sidebar dimuat
+        if (window.SidebarManager && window.SidebarManager.markActiveNav) {
+          setTimeout(() => {
+            window.SidebarManager.markActiveNav();
+          }, 200);
         }
       })();
     </script>
@@ -172,7 +185,7 @@
             <i data-lucide="menu" class="h-6 w-6"></i>
           </button>
           <div class="flex items-center gap-3">
-            <img src="./assets/img/logo-sitsense.svg" alt="SitSense" class="h-7 w-auto hidden md:block" />
+            <img data-image-base="logo-sitsense" alt="SitSense" class="h-7 w-auto hidden md:block" />
             <span class="text-lg font-semibold tracking-tight">Riwayat</span>
           </div>
         </div>

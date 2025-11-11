@@ -58,6 +58,7 @@
 
     <link rel="stylesheet" href="./assets/css/styles.css" />
     <link rel="stylesheet" href="./assets/css/theme.css" />
+    <script src="./assets/js/image-loader.js"></script>
     <style>
       /* Custom Gradient Button Styles */
       .btn-gradient-primary {
@@ -134,7 +135,7 @@
         <div class="pointer-events-none absolute -bottom-28 -right-16 w-80 h-80 rounded-full bg-emerald-400/20 blur-3xl"></div>
 
         <!-- Logo placement -->
-        <img src="./assets/img/logo-sitsense.svg" alt="SitSense Logo" class="mx-auto h-16 md:h-20 w-auto mb-5" />
+        <img data-image-base="logo-sitsense" alt="SitSense Logo" class="mx-auto h-16 md:h-20 w-auto mb-5" />
 
         <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">Selamat Datang di <span class="text-cyan-400">SitSense</span></h1>
         <p class="mt-3 text-slate-300/90">Pemantau postur duduk cerdas. Lebih nyaman, sehat, dan produktif.</p>
@@ -160,7 +161,8 @@
     </div>
 
     <!-- ================= SIDEBAR ================= -->
-     
+    <!-- Sidebar Manager harus dimuat SEBELUM sidebar HTML -->
+    <script src="./assets/js/sidebar.js"></script>
     <div id="sidebar-slot"></div>
     
     <script>
@@ -170,6 +172,16 @@
         // Render icons setelah sidebar dimuat
         if (window.lucide) {
           window.lucide.createIcons();
+        }
+        // Initialize images setelah komponen dimuat
+        if (window.ImageLoader && window.ImageLoader.initializeImages) {
+          setTimeout(() => window.ImageLoader.initializeImages(), 100);
+        }
+        // Mark active nav item setelah sidebar dimuat
+        if (window.SidebarManager && window.SidebarManager.markActiveNav) {
+          setTimeout(() => {
+            window.SidebarManager.markActiveNav();
+          }, 200);
         }
       })();
     </script>
@@ -183,7 +195,7 @@
             <i data-lucide="menu" class="h-6 w-6"></i>
           </button>
           <div class="flex items-center gap-3">
-            <img src="./assets/img/logo-sitsense.svg" alt="SitSense" class="h-7 w-auto hidden md:block" />
+            <img data-image-base="logo-sitsense" alt="SitSense" class="h-7 w-auto hidden md:block" />
             <span class="text-lg font-semibold tracking-tight">Dashboard</span>
           </div>
         </div>
@@ -309,6 +321,11 @@
             const res = await fetch('/components/panel-parameters.html');
             slot.innerHTML = await res.text();
             if (window.lucide) lucide.createIcons(); // render ikon setelah inject
+            
+            // Initialize images setelah komponen dimuat
+            if (window.ImageLoader && window.ImageLoader.initializeImages) {
+              setTimeout(() => window.ImageLoader.initializeImages(), 100);
+            }
             
             // Trigger update balance setelah panel-parameters dimuat
             // Dispatch custom event untuk memberitahu app.js bahwa elemen baru sudah tersedia
@@ -462,6 +479,10 @@
     slot.innerHTML = html;
     if (window.lucide) window.lucide.createIcons();
     const y = document.getElementById('footerYear'); if (y) y.textContent = new Date().getFullYear();
+    // Initialize images setelah komponen dimuat
+    if (window.ImageLoader && window.ImageLoader.initializeImages) {
+      setTimeout(() => window.ImageLoader.initializeImages(), 100);
+    }
   })();
 </script>
 
@@ -471,6 +492,10 @@
     document.getElementById('modal-slot').innerHTML =
       await (await fetch('/components/modal-detail.html')).text();
     if (window.lucide) window.lucide.createIcons();
+    // Initialize images setelah komponen dimuat
+    if (window.ImageLoader && window.ImageLoader.initializeImages) {
+      setTimeout(() => window.ImageLoader.initializeImages(), 100);
+    }
   })();
 </script>
 
@@ -512,8 +537,6 @@
 
     <!-- ================= PLACEHOLDER for future modules ================= -->
     <!-- Uncomment these once files exist to avoid 404s during early setup -->
-    <!-- Sidebar Manager harus dimuat sebelum script lainnya -->
-    <script src="./assets/js/sidebar.js"></script>
     <script src="./assets/js/ui.js"></script>
   <script src="./assets/js/charts.js"></script>
   <script src="./assets/js/posture-visual.js"></script>

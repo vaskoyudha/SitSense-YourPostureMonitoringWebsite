@@ -196,7 +196,7 @@
     <nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#0b1220]/90 backdrop-blur-xl">
       <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <img src="./assets/img/logo-sitsense.svg" alt="SitSense" class="h-8 w-auto" />
+          <img data-image-base="logo-sitsense" alt="SitSense" class="h-8 w-auto" />
           <span class="text-xl font-bold tracking-tight">SitSense</span>
         </div>
         <div class="hidden md:flex items-center gap-6">
@@ -407,7 +407,7 @@
       <div class="relative z-10 text-center max-w-4xl mx-auto w-full px-4 py-12">
         <!-- Logo -->
         <div class="mb-6 flex justify-center" data-aos="zoom-in" data-aos-delay="100">
-          <img src="./assets/img/logo-sitsense.svg" alt="SitSense Logo" class="h-16 md:h-20 w-auto" />
+          <img data-image-base="logo-sitsense" alt="SitSense Logo" class="h-16 md:h-20 w-auto" />
         </div>
         
         <!-- Main Heading -->
@@ -882,7 +882,7 @@ const response = await fetch(
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <div class="flex items-center gap-3 mb-4">
-              <img src="./assets/img/logo-sitsense.svg" alt="SitSense" class="h-8 w-auto" />
+              <img data-image-base="logo-sitsense" alt="SitSense" class="h-8 w-auto" />
               <span class="text-xl font-bold">SitSense</span>
             </div>
             <p class="text-sm text-slate-400">
@@ -921,6 +921,7 @@ const response = await fetch(
     </footer>
 
     <!-- ================= SCRIPTS ================= -->
+    <script src="./assets/js/image-loader.js"></script>
     <script>
       // Tandai bahwa user sudah mengunjungi home
       localStorage.setItem('sitsense-visited-home', 'true');
